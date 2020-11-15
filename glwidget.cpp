@@ -96,6 +96,7 @@ void GLWidget::initializeGL()
     gl->glEnable(GL_BLEND);
     gl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     QString welcome = "Welcome";
+
     glFont->setText(welcome, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
 
 }
@@ -118,22 +119,20 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::updateText(const QString& text)
 {
-    if (text.size() == 0)
+    if (text.size() != 0)
     {
-        renderText = false;
-        update();
-        return;
+        setUpdatesEnabled(false);
+
+        glFont->setText(text, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
+
+        setUpdatesEnabled(true);
+        renderText = true;s
     }
     else
     {
-        renderText = true;
+        renderText = false;
     }
 
-    setUpdatesEnabled(false);
-
-    glFont->setText(text, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
-
-    setUpdatesEnabled(true);
     update();
 }
 

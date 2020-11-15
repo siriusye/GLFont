@@ -14,6 +14,8 @@ FreeType 2 http://freetype.org/
 
 GLM https://glm.g-truc.net/0.9.9/index.html 
 
+Two testing fonts are included in the repo, however, they are personal uses only 
+
 ### Installation
 Build from the CMAKE file
 

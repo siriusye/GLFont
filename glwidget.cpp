@@ -86,7 +86,6 @@ void GLWidget::initializeGL()
     textShader->initialize(gl, textVert, textFrag);
     textShader->bind();
     textShader->setUniformVec3("textColor", glm::vec3(0.0, 0.5, 1.0));
-    // textShader->setUniformVec3("outlineColor", glm::vec3(1.0, 0.5, 0.3));
 
     glFont = new GLFont();
     glFont->initialize(gl, this->width(), this->height());

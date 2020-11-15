@@ -1,2 +1,4 @@
 # GLFont
-Font rendering with OpenGL in Qt
+GLFont is a small font rendering application using OpenGL and Qt
+
+## Technical

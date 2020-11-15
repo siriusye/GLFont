@@ -126,7 +126,7 @@ void GLWidget::updateText(const QString& text)
         glFont->setText(text, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
 
         setUpdatesEnabled(true);
-        renderText = true;s
+        renderText = true;
     }
     else
     {

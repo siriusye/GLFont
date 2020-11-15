@@ -4,8 +4,8 @@ GLFont is a small font rendering application using FreeType and Qt. It creates a
 ![Welcome UI](image/screenshot.png)
 
 ### Functionality
-- It loads different fonts and show in the OpenGL Window
-- Outline can be enabled
+- Loads different fonts and show typed text in the OpenGL Window
+- Enable Outline via option menu  
 
 ### Dependencies
 Qt 5 https://www.qt.io/
@@ -17,5 +17,6 @@ GLM https://glm.g-truc.net/0.9.9/index.html
 Two testing fonts are included in the repo, however, they are personal uses only 
 
 ### Installation
+Clone the repo
 Build from the CMAKE file
 

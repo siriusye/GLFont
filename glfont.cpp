@@ -4,24 +4,23 @@
 #include "freetype/ftglyph.h"
 #include "freetype/ftstroke.h"
 
-// TODO: hardcoded, need to resize according to the glwidget window
-const int MAXWIDTH = 552;
-
 GLFont::GLFont()
 {
-    outlineThickness = 1.0f;
+    outlineThickness = 1;
     scaling = 0.01f;
-    lineHeight = 30;
+    fontSize = 42;
 }
 
-GLuint GLFont::getTextureID()
+void GLFont::setFontSize(int size)
 {
-    return tex;
+    this->fontSize = size;
+    generateAtlas();
+    updateText();
 }
 
-int GLFont::getLineHeight()
+int GLFont::getFontSize()
 {
-    return lineHeight;
+    return fontSize;
 }
 
 float GLFont::getScaling()
@@ -29,23 +28,21 @@ float GLFont::getScaling()
     return scaling;
 }
 
-bool GLFont::setFont(std::string& path)
+bool GLFont::setFont(const QString& path)
 {
-    FT_Face face;
-    if (FT_New_Face(ft, path.c_str(), 0, &face)) {
+    if (FT_New_Face(ft, path.toStdString().c_str(), 0, &face)) {
         std::cout << "Failed to create face for loaded font" << std::endl;
         return false;
     }
     else {
-        generateAtlas(face, lineHeight, ft);
+        generateAtlas();
     }
-    FT_Done_Face(face);
 
     return true;
 }
 
 // TODO: rework on process
-void GLFont::initialize(QOpenGLFunctions_3_3_Core* glFucntions)
+void GLFont::initialize(QOpenGLFunctions_3_3_Core* glFucntions, int width, int height)
 {
     gl = glFucntions;
 
@@ -70,13 +67,16 @@ void GLFont::initialize(QOpenGLFunctions_3_3_Core* glFucntions)
     gl->glActiveTexture(GL_TEXTURE0);
     gl->glGenTextures(1, &tex);
 
-    std::string path("font/OpenSans-Regular.ttf");
+    screenWidth = width;
+    screenHeight = height;
+
+    QString path("font/OpenSans-Regular.ttf");
     setFont(path);
 }
 
-bool GLFont::generateAtlas(FT_Face face, int size, FT_Library ft)
+bool GLFont::generateAtlas()
 {
-    if (FT_Set_Pixel_Sizes(face, 0, size))
+    if (FT_Set_Pixel_Sizes(face, 0, fontSize))
     {
         return false;
     }
@@ -150,7 +150,7 @@ bool GLFont::generateAtlas(FT_Face face, int size, FT_Library ft)
         characters[i].bitmapLeft = glyphBitmap->left;
         characters[i].bitmapTop = glyphBitmap->top;
        
-        if (rowWidth + bitmapWidth + 1 >= MAXWIDTH) {
+        if (rowWidth + bitmapWidth + 1 >= screenWidth) {
             atlasWidth = atlasWidth > rowWidth ? atlasWidth : rowWidth;
             atlasHeight += rowHeight;
             rowWidth = 0;
@@ -186,7 +186,7 @@ bool GLFont::generateAtlas(FT_Face face, int size, FT_Library ft)
             return false;
         }
 
-        if (offsetX + characters[i].bitmapWidth + 1 >= MAXWIDTH) {
+        if (offsetX + characters[i].bitmapWidth + 1 >= screenWidth) {
             offsetY += rowHeight;
             rowHeight = 0;
             offsetX = 0;
@@ -211,9 +211,10 @@ bool GLFont::generateAtlas(FT_Face face, int size, FT_Library ft)
         {
             for (unsigned int x = 0; x < bitmapWidth; ++x)
             {
-                unsigned int i_source = y * bitmapWidth + x;
-                unsigned int i_target = (y + innerOffsetX) * characters[i].bitmapWidth + x + innerOffsetY;
-                buffers[i][i_target * 2 + 0] = bitmapStroke.buffer[i_source]; 
+                unsigned int source = y * bitmapWidth + x;
+                unsigned int target = (y + innerOffsetX) * characters[i].bitmapWidth + x + innerOffsetY;
+
+                buffers[i][target * 2] = bitmapStroke.buffer[source];
             }
         }
 
@@ -228,23 +229,38 @@ bool GLFont::generateAtlas(FT_Face face, int size, FT_Library ft)
     return true;
 }
 
-void GLFont::updateText(std::string& input, float x, float y, float sx, float sy)
+void GLFont::setText(const QString& input, float x, float y, float sx, float sy)
+{
+    this->text = input;
+    this->xPos = x;
+    this->yPos = y;
+    this->xScale = sx;
+    this->yScale = sy;
+    updateText();
+}
+
+void GLFont::updateText()
 {
     std::vector<glm::vec4> coordinates;
-    coordinates.resize(6* input.length());
+    coordinates.resize(6* text.length());
+
+    float x = xPos;
+    float y = yPos;
+    float sx = xScale;
+    float sy = yScale;
 
     sx *= scaling;
     sy *= scaling;
 
-    for (int i = 0; i < input.length(); i++)
+    for (int i = 0; i < text.length(); i++)
     {
         // TODO: find check contain
-        Character c = characters[input.at(i)];
+        Character c = characters[text.toStdString().at(i)];
 
         if (x + c.advanceX * sx> 1.0)
         {
             x = -1;
-            y -= lineHeight * scaling;
+            y -= fontSize * scaling;
         }
 
         float x2 = x + c.bitmapLeft * sx;
@@ -281,7 +297,9 @@ void GLFont::renderText()
 
 GLFont::~GLFont()
 {
+    FT_Done_Face(face);
     FT_Done_FreeType(ft);
+
     gl->glDeleteTextures(1, &tex);
     gl->glDeleteBuffers(1, &vbo);
     gl->glDeleteVertexArrays(1, &vao);

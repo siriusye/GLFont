@@ -25,6 +25,7 @@ public:
 public slots:
     void updateText(const QString& text);
     void updateFont(const QString& path);
+    void toggleOutline(bool);
 
 protected:
     void initializeGL() override;

@@ -4,7 +4,6 @@
 #include <QtDebug>
 #include <math.h>
 #include <iostream>
-#include <string>
 
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
@@ -42,7 +41,7 @@ void main()
 };
 )END";
 
-static const char* textFrag = R"END(
+static const char* textFragOutline = R"END(
 #version 330 core
 in vec2 texCoords;
 out vec4 color; 
@@ -61,6 +60,22 @@ void main()
 };
 )END";
 
+
+static const char* textFrag = R"END(
+#version 330 core
+in vec2 texCoords;
+out vec4 color;
+
+uniform sampler2D text;
+uniform vec3 textColor;
+
+void main()
+{
+    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);
+    color = vec4(textColor, 1.0) * sampled;
+}
+)END";
+
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -71,16 +86,18 @@ void GLWidget::initializeGL()
     textShader->initialize(gl, textVert, textFrag);
     textShader->bind();
     textShader->setUniformVec3("textColor", glm::vec3(0.0, 0.5, 1.0));
-    textShader->setUniformVec3("outlineColor", glm::vec3(1.0, 0.5, 0.3));
+    // textShader->setUniformVec3("outlineColor", glm::vec3(1.0, 0.5, 0.3));
 
     glFont = new GLFont();
-    glFont->initialize(gl);
+    glFont->initialize(gl, this->width(), this->height());
 
     gl->glClearColor(0.811f, 0.886f, 0.953f, 1);
     gl->glEnable(GL_CULL_FACE);
     gl->glEnable(GL_BLEND);
     gl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glFont->updateText(std::string("Welcome"),-1, 1 - glFont->getLineHeight() * glFont->getScaling(), 1.0, 1.0);
+    QString welcome = "Welcome";
+    glFont->setText(welcome, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
+
 }
 
 void GLWidget::paintGL()
@@ -96,7 +113,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    // TODO: resize gl
+
 }
 
 void GLWidget::updateText(const QString& text)
@@ -112,10 +129,9 @@ void GLWidget::updateText(const QString& text)
         renderText = true;
     }
 
-    std::string output;
     setUpdatesEnabled(false);
 
-    glFont->updateText(text.toStdString(), -1, 1 - glFont->getLineHeight() * glFont->getScaling(), 1.0, 1.0);
+    glFont->setText(text, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
 
     setUpdatesEnabled(true);
     update();
@@ -123,5 +139,24 @@ void GLWidget::updateText(const QString& text)
 
 void GLWidget::updateFont(const QString& path)
 {
-    qDebug() << path;
+    glFont->setFont(path);
+    glFont->updateText();
+}
+
+void GLWidget::toggleOutline(bool outline)
+{
+    if(outline)
+    {
+        textShader->initialize(gl, textVert, textFragOutline);
+        textShader->bind();
+        textShader->setUniformVec3("textColor", glm::vec3(0.0, 0.5, 1.0));
+        textShader->setUniformVec3("outlineColor", glm::vec3(1.0, 0.5, 0.3));
+    }
+    else
+    {
+        textShader->initialize(gl, textVert, textFrag);
+        textShader->bind();
+        textShader->setUniformVec3("textColor", glm::vec3(0.0, 0.5, 1.0));
+    }
+    update();
 }

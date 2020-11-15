@@ -13,8 +13,6 @@ class GLFont
 private:
     QOpenGLFunctions_3_3_Core* gl;
 
-    float outlineThickness;
-
 	GLuint tex;		
 	GLuint vbo;
 	GLuint vao;
@@ -25,9 +23,19 @@ private:
 	int vertexCount;
 
 	// TODO: need a propar scaling according to the screen space
-	float scaling;
+    float scaling;
+    int fontSize;
+    int outlineThickness;
 
-	int lineHeight;
+    int screenWidth;
+    int screenHeight;
+
+    QString text;
+    float xPos;
+    float yPos;
+    float xScale;
+    float yScale;
+
 
 	struct Character {
 		float advanceX;	
@@ -43,22 +51,26 @@ private:
 		float offsetY;
 	};
 
-	std::unordered_map<char, Character> characters;
+    std::unordered_map<char, Character> characters;
 
     FT_Library ft;
+    FT_Face face;
 
 public:
     GLFont();
 	~GLFont();
-	void initialize(QOpenGLFunctions_3_3_Core* glFucntions);
-    bool setFont(std::string& path);
-    bool setFontSize(int size);
-	bool generateAtlas(FT_Face face, int size, FT_Library ft);
-    void updateText(std::string& input, float x, float y, float sx, float sy);
+    void initialize(QOpenGLFunctions_3_3_Core* glFucntions, int width, int height);
+
+    bool generateAtlas();
+
+    void updateText();
 	void renderText();
 
-	GLuint getTextureID();
-	int getLineHeight();
+    bool setFont(const QString&);
+    void setFontSize(int size);
+    void setText(const QString& input, float x, float y, float sx, float sy);
+
+    int getFontSize();
 	float getScaling();
 };
 

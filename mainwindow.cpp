@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(lineEdit, SIGNAL(textChanged(const QString&)), glWidget, SLOT(updateText(const QString&)));
     connect(this, SIGNAL(fontChanged(const QString&)), glWidget, SLOT(updateFont(const QString&)));
+    connect(ui->actionOutline, SIGNAL(toggled(bool)), glWidget, SLOT(toggleOutline(bool)));
 }
 
 MainWindow::~MainWindow()
@@ -54,8 +55,6 @@ void MainWindow::loadFont()
         fileName = QFileDialog::getOpenFileName(this,
             tr("Load font"), currentPath, tr("Font Files (*.ttf)"));
     }
-
-    qDebug() << fileName;
 
     currentPath = fileName.left(fileName.lastIndexOf('\\'));
     emit fontChanged(fileName);

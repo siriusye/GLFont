@@ -5,7 +5,7 @@ GLFont is a small font rendering application using FreeType and Qt. It creates a
 
 ### Functionality
 - Loads different fonts and show typed text in the OpenGL Window
-- Enable Outline via option menu  
+- Enable outline via option menu  
 
 ### Dependencies
 Qt 5 https://www.qt.io/

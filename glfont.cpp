@@ -8,7 +8,7 @@ GLFont::GLFont()
 {
     outlineThickness = 1;
     scaling = 0.01f;
-    fontSize = 42;
+    fontSize = 36;
 }
 
 void GLFont::setFontSize(int size)

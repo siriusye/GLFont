@@ -95,7 +95,7 @@ void GLWidget::initializeGL()
     gl->glEnable(GL_CULL_FACE);
     gl->glEnable(GL_BLEND);
     gl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    QString welcome = "Welcome";
+    QString welcome = "Hello World";
 
     glFont->setText(welcome, -1, 1 - glFont->getFontSize() * glFont->getScaling(), 1.0, 1.0);
 

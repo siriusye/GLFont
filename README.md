@@ -1,4 +1,6 @@
 # GLFont
-GLFont is a small font rendering application using OpenGL and Qt
+GLFont is a small font rendering application using an altas texture and a single draw call.
 
-## Technical
+![Welcome UI](image/screenshot.png)
+
+## 

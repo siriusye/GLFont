@@ -1,5 +1,5 @@
 # GLFont
-GLFont is a small font rendering application using FreeType and Qt. It creates an altas texture and renders fonts in a single draw call. 
+GLFont is a small font rendering application using FreeType and Qt. It creates an altas texture and renders outlined fonts in a single draw call. 
 
 ![Welcome UI](image/screenshot.png)
 

@@ -18,5 +18,6 @@ Two testing fonts are included in the repo, however, they are personal uses only
 
 ### Installation
 Clone the repo
+
 Build from the CMAKE file
 
